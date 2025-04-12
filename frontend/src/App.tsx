@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { useTranslation } from 'react-i18next';
 import './App.css';
+import './i18n/i18n';
 import Popup from './components/Popup';
+import LanguageSelector from './components/LanguageSelector';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
@@ -32,12 +35,36 @@ function App() {
   // Popup-States
   const [createGamePopupOpen, setCreateGamePopupOpen] = useState<boolean>(false);
   const [joinGamePopupOpen, setJoinGamePopupOpen] = useState<boolean>(false);
+  const [playerLeftPopupOpen, setPlayerLeftPopupOpen] = useState<boolean>(false);
   const [gameIdToJoin, setGameIdToJoin] = useState<string>('');
+  
+  const { t } = useTranslation();
 
   // Darkmode Toggle Funktion
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
+  
+  // Prüfe Systemeinstellung für Darkmode
+  useEffect(() => {
+    const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setDarkMode(prefersDarkMode);
+    
+    // Listener für Änderungen der Systemeinstellung
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleDarkModeChange = (e: MediaQueryListEvent) => {
+      setDarkMode(e.matches);
+    };
+    
+    if (darkModeMediaQuery.addEventListener) {
+      darkModeMediaQuery.addEventListener('change', handleDarkModeChange);
+      return () => darkModeMediaQuery.removeEventListener('change', handleDarkModeChange);
+    } else {
+      // Fallback für ältere Browser
+      darkModeMediaQuery.addListener(handleDarkModeChange);
+      return () => darkModeMediaQuery.removeListener(handleDarkModeChange);
+    }
+  }, []);
 
   // Funktion zum Teilen der Game-ID
   const shareGameUrl = () => {
@@ -46,11 +73,11 @@ function App() {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(shareUrl)
         .then(() => {
-          setCopySuccess('Link in die Zwischenablage kopiert!');
+          setCopySuccess(t('messages.copied'));
           setTimeout(() => setCopySuccess(''), 3000);
         })
         .catch(() => {
-          setCopySuccess('Fehler beim Kopieren!');
+          setCopySuccess(t('messages.copyError'));
           setTimeout(() => setCopySuccess(''), 3000);
         });
     } else {
@@ -62,10 +89,10 @@ function App() {
       textArea.select();
       try {
         document.execCommand('copy');
-        setCopySuccess('Link in die Zwischenablage kopiert!');
+        setCopySuccess(t('messages.copied'));
         setTimeout(() => setCopySuccess(''), 3000);
       } catch (err) {
-        setCopySuccess('Fehler beim Kopieren!');
+        setCopySuccess(t('messages.copyError'));
         setTimeout(() => setCopySuccess(''), 3000);
       }
       document.body.removeChild(textArea);
@@ -103,6 +130,11 @@ function App() {
 
     newSocket.on('error', (message: string) => {
       setError(message);
+      
+      // Wenn der andere Spieler die Verbindung getrennt hat
+      if (message === 'Other player disconnected') {
+        setPlayerLeftPopupOpen(true);
+      }
     });
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -153,18 +185,30 @@ function App() {
       setJoinGamePopupOpen(false);
     }
   };
+  
+  const handlePlayerLeftResponse = (response: string) => {
+    setPlayerLeftPopupOpen(false);
+    setError('');
+    
+    if (response === 'yes') {
+      createNewGame();
+    }
+  };
 
   return (
     <div className="app">
       <div className="header">
-        <h1>Tic Tac Toe Multiplayer</h1>
-        <button 
-          className="theme-toggle" 
-          onClick={toggleDarkMode}
-          aria-label={darkMode ? 'Zum hellen Modus wechseln' : 'Zum dunklen Modus wechseln'}
-        >
-          {darkMode ? '☀️' : '🌙'}
-        </button>
+        <h1>{t('app.title')}</h1>
+        <div className="header-controls">
+          <LanguageSelector />
+          <button 
+            className="theme-toggle" 
+            onClick={toggleDarkMode}
+            aria-label={darkMode ? t('app.darkMode.dark') : t('app.darkMode.light')}
+          >
+            {darkMode ? '☀️' : '🌙'}
+          </button>
+        </div>
       </div>
       
       {error && <div className="error">{error}</div>}
@@ -175,71 +219,82 @@ function App() {
         isOpen={createGamePopupOpen}
         onClose={() => setCreateGamePopupOpen(false)}
         onSubmit={handleCreateGameSubmit}
-        title="Neues Spiel erstellen"
-        placeholder="Bitte geben Sie Ihren Namen ein"
+        title={t('popup.createGame.title')}
+        placeholder={t('popup.createGame.placeholder')}
       />
       
       <Popup
         isOpen={joinGamePopupOpen}
         onClose={() => setJoinGamePopupOpen(false)}
         onSubmit={handleJoinGameSubmit}
-        title="Einem Spiel beitreten"
-        placeholder="Bitte geben Sie Ihren Namen ein"
+        title={t('popup.joinGame.title')}
+        placeholder={t('popup.joinGame.placeholder')}
+      />
+      
+      <Popup
+        isOpen={playerLeftPopupOpen}
+        onClose={() => setPlayerLeftPopupOpen(false)}
+        onSubmit={handlePlayerLeftResponse}
+        title={t('popup.playerLeft.title')}
+        isConfirmation={true}
+        confirmationMessage={t('popup.playerLeft.message')}
+        confirmText={t('popup.yes')}
+        cancelText={t('popup.no')}
       />
       
       {!gameId ? (
         <div className="game-setup">
           <div className="info-text">
-            <h2>Willkommen zum Tic Tac Toe Multiplayer!</h2>
-            <p>Erstelle ein neues Spiel oder tritt einem bestehenden Spiel bei.</p>
+            <h2>{t('game.welcome.title')}</h2>
+            <p>{t('game.welcome.description')}</p>
           </div>
-          <button onClick={createNewGame}>Create New Game</button>
+          <button onClick={createNewGame}>{t('game.createGame')}</button>
           <div className="join-game">
             <input
               type="text"
-              placeholder="Enter Game ID"
+              placeholder={t('game.enterGameId')}
               value={inputGameId}
               onChange={(e) => setInputGameId(e.target.value)}
             />
-            <button onClick={() => joinGame(inputGameId)}>Join Game</button>
+            <button onClick={() => joinGame(inputGameId)}>{t('game.joinGame')}</button>
           </div>
         </div>
       ) : (
         <div className="game">
           <div className="game-info">
             <div className="game-id-container">
-              <p>Game ID: {gameId}</p>
+              <p>{t('game.gameId')}: {gameId}</p>
               <button 
                 className="share-button" 
                 onClick={shareGameUrl}
-                title="Spiel-Link teilen"
+                title={t('game.share')}
               >
-                Teilen
+                {t('game.share')}
               </button>
             </div>
             {/* Spielernamen anzeigen */}
             <div className="player-info">
               {gameState.players.map((player, index) => (
                 <p key={index} className={player.id === playerId ? 'current-player' : ''}>
-                  Spieler {player.symbol}: {player.name} {player.id === playerId ? '(Du)' : ''}
+                  {t('game.player')} {player.symbol}: {player.name} {player.id === playerId ? t('game.you') : ''}
                 </p>
               ))}
             </div>
             
             {gameState.players.length < 2 ? (
-              <p className="waiting-message">Warte auf zweiten Spieler...</p>
+              <p className="waiting-message">{t('game.waiting')}</p>
             ) : (
               <p className="current-turn">
-                Am Zug: {gameState.players.find(p => p.symbol === gameState.currentPlayer)?.name} ({gameState.currentPlayer})
+                {t('game.currentTurn')}: {gameState.players.find(p => p.symbol === gameState.currentPlayer)?.name} ({gameState.currentPlayer})
                 {gameState.players.find(p => p.symbol === gameState.currentPlayer)?.id !== playerId && 
-                  <span className="not-your-turn"> - Nicht dein Zug</span>}
+                  <span className="not-your-turn">{t('game.notYourTurn')}</span>}
               </p>
             )}
             
             {gameState.winner && (
               <p className="winner-message">
-                {gameState.winner === 'draw' ? 'Unentschieden!' : 
-                  `Gewinner: ${gameState.players.find(p => p.symbol === gameState.winner)?.name}`}
+                {gameState.winner === 'draw' ? t('game.draw') : 
+                  `${t('game.winner')}: ${gameState.players.find(p => p.symbol === gameState.winner)?.name}`}
               </p>
             )}
           </div>
@@ -259,7 +314,7 @@ function App() {
           </div>
           
           {gameState.gameOver && (
-            <button onClick={createNewGame}>Start New Game</button>
+            <button onClick={createNewGame}>{t('game.startNewGame')}</button>
           )}
         </div>
       )}

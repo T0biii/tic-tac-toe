@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface PopupProps {
   isOpen: boolean;
@@ -6,17 +7,32 @@ interface PopupProps {
   onSubmit: (value: string) => void;
   title: string;
   placeholder?: string;
+  isConfirmation?: boolean;
+  confirmationMessage?: string;
+  confirmText?: string;
+  cancelText?: string;
 }
 
-const Popup: React.FC<PopupProps> = ({ isOpen, onClose, onSubmit, title, placeholder = 'Bitte eingeben' }) => {
+const Popup: React.FC<PopupProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  title,
+  placeholder,
+  isConfirmation = false,
+  confirmationMessage,
+  confirmText,
+  cancelText
+}) => {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputValue.trim()) {
-      onSubmit(inputValue);
+    if (isConfirmation || inputValue.trim()) {
+      onSubmit(isConfirmation ? 'yes' : inputValue);
       setInputValue('');
     }
   };
@@ -24,6 +40,13 @@ const Popup: React.FC<PopupProps> = ({ isOpen, onClose, onSubmit, title, placeho
   const handleClose = () => {
     setInputValue('');
     onClose();
+  };
+
+  const handleCancel = () => {
+    if (isConfirmation) {
+      onSubmit('no');
+    }
+    handleClose();
   };
 
   return (
@@ -37,20 +60,24 @@ const Popup: React.FC<PopupProps> = ({ isOpen, onClose, onSubmit, title, placeho
         </div>
         <form onSubmit={handleSubmit}>
           <div className="popup-content">
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder={placeholder}
-              autoFocus
-            />
+            {isConfirmation ? (
+              <p>{confirmationMessage}</p>
+            ) : (
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder={placeholder}
+                autoFocus
+              />
+            )}
           </div>
           <div className="popup-actions">
-            <button type="button" className="cancel-button" onClick={handleClose}>
-              Abbrechen
+            <button type="button" className="cancel-button" onClick={handleCancel}>
+              {cancelText || t('popup.cancel')}
             </button>
             <button type="submit" className="submit-button">
-              Bestätigen
+              {confirmText || t('popup.confirm')}
             </button>
           </div>
         </form>

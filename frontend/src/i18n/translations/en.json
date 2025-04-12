@@ -1,0 +1,61 @@
+{
+  "app": {
+    "title": "Tic Tac Toe Multiplayer",
+    "darkMode": {
+      "light": "Switch to dark mode",
+      "dark": "Switch to light mode"
+    }
+  },
+  "game": {
+    "welcome": {
+      "title": "Welcome to Tic Tac Toe Multiplayer!",
+      "description": "Create a new game or join an existing game."
+    },
+    "createGame": "Create New Game",
+    "joinGame": "Join Game",
+    "gameId": "Game ID",
+    "enterGameId": "Enter Game ID",
+    "share": "Share",
+    "player": "Player",
+    "you": "(You)",
+    "waiting": "Waiting for second player...",
+    "currentTurn": "Current turn",
+    "notYourTurn": "- Not your turn",
+    "winner": "Winner",
+    "draw": "It's a draw!",
+    "startNewGame": "Start New Game",
+    "playerLeft": "The other player has left the game.",
+    "startNewGameQuestion": "Would you like to start a new game?"
+  },
+  "popup": {
+    "createGame": {
+      "title": "Create New Game",
+      "placeholder": "Please enter your name"
+    },
+    "joinGame": {
+      "title": "Join a Game",
+      "placeholder": "Please enter your name"
+    },
+    "playerLeft": {
+      "title": "Player Left the Game",
+      "message": "The other player has left the game. Would you like to start a new game?"
+    },
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "messages": {
+    "copied": "Link copied to clipboard!",
+    "copyError": "Error copying to clipboard!",
+    "error": {
+      "gameNotFound": "Game not found",
+      "gameFull": "Game is full",
+      "gameOver": "Game is over",
+      "playerNotFound": "Player not found in this game",
+      "notYourTurn": "Not your turn",
+      "positionTaken": "Position already taken",
+      "playerDisconnected": "Other player disconnected"
+    }
+  }
+}

@@ -12,6 +12,36 @@
   margin-bottom: 20px;
 }
 
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.language-selector {
+  display: flex;
+  gap: 5px;
+}
+
+.language-button {
+  padding: 5px 8px;
+  border-radius: 4px;
+  background-color: var(--info-bg);
+  color: var(--text-color);
+  font-size: 0.8em;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.language-button:hover {
+  background-color: var(--info-text-bg);
+}
+
+.language-button.active {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+}
+
 .theme-toggle {
   width: 40px;
   height: 40px;
