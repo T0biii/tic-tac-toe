@@ -1,0 +1,46 @@
+name: Docker Publish
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push frontend
+        working-directory: frontend
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/tic-tac-toe-frontend:latest \
+                       -t ghcr.io/${{ github.repository_owner }}/tic-tac-toe-frontend:${{ github.sha }} .
+          docker push ghcr.io/${{ github.repository_owner }}/tic-tac-toe-frontend --all-tags
+
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend
+        working-directory: backend
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/tic-tac-toe-backend:latest \
+                       -t ghcr.io/${{ github.repository_owner }}/tic-tac-toe-backend:${{ github.sha }} .
+          docker push ghcr.io/${{ github.repository_owner }}/tic-tac-toe-backend --all-tags

@@ -99,19 +99,25 @@ io.on('connection', (socket) => {
     const totalPlayers = game.players.length;
     
     if (totalVotes === totalPlayers) {
-      // Alle Spieler haben zugestimmt, Spiel zurücksetzen
+      // Spiel vollständig zurücksetzen
       game.board = Array(9).fill('');
       game.currentPlayer = 'X';
       game.winner = null;
       game.gameOver = false;
-      game.restartVotes = {}; // Zurücksetzen der Stimmen
+      game.restartVotes = {};
+      
+      // Aktualisierte Spielinstanz setzen
+      games.set(gameId, game);
+      
+      // Neuen Spielzustand an alle senden
+      io.to(gameId).emit('gameState', {
+        ...game,
+        players: game.players.map(p => ({...p}))
+      });
+    } else {
+      // Teilaktualisierung senden
+      io.to(gameId).emit('gameState', game);
     }
-    
-    // Aktualisiere das Spiel in der Map
-    games.set(gameId, game);
-    
-    // Sende den aktualisierten Spielstatus an alle Spieler
-    io.to(gameId).emit('gameState', game);
   });
   
   // Behalte die alte restartGame-Funktion für Kompatibilität
