@@ -5,6 +5,41 @@
   text-align: center;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  font-size: 1.2em;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--info-bg);
+  color: var(--text-color);
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: rotate(30deg);
+  background-color: var(--info-text-bg);
+}
+
+.success-message {
+  color: var(--winner-text);
+  margin: 10px 0;
+  padding: 10px;
+  background-color: var(--info-text-bg);
+  border-radius: 5px;
+  border-left: 4px solid var(--winner-text);
+}
+
 .game-setup {
   margin: 20px 0;
 }
@@ -27,34 +62,47 @@
 .cell {
   aspect-ratio: 1;
   font-size: 3em; /* Größere Schriftgröße für bessere Sichtbarkeit */
-  border: 2px solid #333;
-  background: #fff;
+  border: 2px solid var(--border-color);
+  background: var(--cell-bg);
   cursor: pointer;
-  transition: background-color 0.2s;
-  color: #333; /* Farbe für X und O */
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  color: var(--text-color);
 }
 
 .cell:hover {
-  background-color: #f0f0f0;
+  background-color: var(--cell-hover);
 }
 .cell:disabled {
   cursor: not-allowed;
-  background-color: #f0f0f0;
+  background-color: var(--cell-disabled);
 }
 
 .game-info {
   margin: 20px 0;
   padding: 10px;
-  background-color: #f5f5f5;
+  background-color: var(--info-bg);
   border-radius: 5px;
+}
+
+.game-id-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.share-button {
+  padding: 5px 10px;
+  font-size: 0.9em;
+  background-color: var(--info-border);
 }
 
 .info-text {
   margin: 20px 0;
   padding: 15px;
-  background-color: #e8f4f8;
+  background-color: var(--info-text-bg);
   border-radius: 5px;
-  border-left: 4px solid #4CAF50;
+  border-left: 4px solid var(--info-border);
 }
 
 .player-info {
@@ -66,11 +114,11 @@
 
 .current-player {
   font-weight: bold;
-  color: #4CAF50;
+  color: var(--current-player);
 }
 
 .waiting-message {
-  color: #ff9800;
+  color: var(--waiting-text);
   font-style: italic;
 }
 
@@ -79,22 +127,22 @@
 }
 
 .not-your-turn {
-  color: #f44336;
+  color: var(--not-your-turn);
   font-style: italic;
 }
 
 .winner-message {
-  color: #4CAF50;
+  color: var(--winner-text);
   font-weight: bold;
   font-size: 1.2em;
   margin-top: 10px;
 }
 
 .error {
-  color: red;
+  color: var(--error-text);
   margin: 10px 0;
   padding: 10px;
-  background-color: #ffebee;
+  background-color: var(--error-bg);
   border-radius: 5px;
 }
 
@@ -105,7 +153,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--popup-overlay);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -113,7 +161,7 @@
 }
 
 .popup-container {
-  background-color: white;
+  background-color: var(--popup-bg);
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   width: 90%;
@@ -126,8 +174,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #ddd;
+  background-color: var(--popup-header);
+  border-bottom: 1px solid var(--popup-border);
 }
 
 .popup-header h3 {
@@ -140,7 +188,7 @@
   border: none;
   font-size: 1.5em;
   cursor: pointer;
-  color: #666;
+  color: var(--text-color);
   padding: 0;
 }
 
@@ -158,39 +206,41 @@
   display: flex;
   justify-content: flex-end;
   padding: 15px 20px;
-  background-color: #f5f5f5;
-  border-top: 1px solid #ddd;
+  background-color: var(--popup-header);
+  border-top: 1px solid var(--popup-border);
   gap: 10px;
 }
 
 .cancel-button {
-  background-color: #f5f5f5;
-  color: #333;
-  border: 1px solid #ddd;
+  background-color: var(--popup-header);
+  color: var(--text-color);
+  border: 1px solid var(--popup-border);
 }
 
 .submit-button {
-  background-color: #4CAF50;
+  background-color: var(--button-bg);
 }
 
 button {
   padding: 10px 20px;
   font-size: 1em;
-  background-color: #4CAF50;
-  color: white;
+  background-color: var(--button-bg);
+  color: var(--button-text);
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: var(--button-hover);
 }
 
 input {
   padding: 10px;
   font-size: 1em;
-  border: 1px solid #ddd;
+  border: 1px solid var(--popup-border);
   border-radius: 5px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }

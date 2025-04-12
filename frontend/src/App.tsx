@@ -26,11 +26,60 @@ function App() {
   const [gameId, setGameId] = useState<string>('');
   const [inputGameId, setInputGameId] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [darkMode, setDarkMode] = useState<boolean>(false);
+  const [copySuccess, setCopySuccess] = useState<string>('');
   
   // Popup-States
   const [createGamePopupOpen, setCreateGamePopupOpen] = useState<boolean>(false);
   const [joinGamePopupOpen, setJoinGamePopupOpen] = useState<boolean>(false);
   const [gameIdToJoin, setGameIdToJoin] = useState<string>('');
+
+  // Darkmode Toggle Funktion
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
+  // Funktion zum Teilen der Game-ID
+  const shareGameUrl = () => {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?gameId=${gameId}`;
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl)
+        .then(() => {
+          setCopySuccess('Link in die Zwischenablage kopiert!');
+          setTimeout(() => setCopySuccess(''), 3000);
+        })
+        .catch(() => {
+          setCopySuccess('Fehler beim Kopieren!');
+          setTimeout(() => setCopySuccess(''), 3000);
+        });
+    } else {
+      // Fallback für Browser, die die Clipboard API nicht unterstützen
+      const textArea = document.createElement('textarea');
+      textArea.value = shareUrl;
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopySuccess('Link in die Zwischenablage kopiert!');
+        setTimeout(() => setCopySuccess(''), 3000);
+      } catch (err) {
+        setCopySuccess('Fehler beim Kopieren!');
+        setTimeout(() => setCopySuccess(''), 3000);
+      }
+      document.body.removeChild(textArea);
+    }
+  };
+
+  // Darkmode Effect
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+  }, [darkMode]);
 
   useEffect(() => {
     const newSocket = io(BACKEND_URL);
@@ -107,9 +156,19 @@ function App() {
 
   return (
     <div className="app">
-      <h1>Tic Tac Toe Multiplayer</h1>
+      <div className="header">
+        <h1>Tic Tac Toe Multiplayer</h1>
+        <button 
+          className="theme-toggle" 
+          onClick={toggleDarkMode}
+          aria-label={darkMode ? 'Zum hellen Modus wechseln' : 'Zum dunklen Modus wechseln'}
+        >
+          {darkMode ? '☀️' : '🌙'}
+        </button>
+      </div>
       
       {error && <div className="error">{error}</div>}
+      {copySuccess && <div className="success-message">{copySuccess}</div>}
       
       {/* Popups */}
       <Popup
@@ -148,7 +207,16 @@ function App() {
       ) : (
         <div className="game">
           <div className="game-info">
-            <p>Game ID: {gameId}</p>
+            <div className="game-id-container">
+              <p>Game ID: {gameId}</p>
+              <button 
+                className="share-button" 
+                onClick={shareGameUrl}
+                title="Spiel-Link teilen"
+              >
+                Teilen
+              </button>
+            </div>
             {/* Spielernamen anzeigen */}
             <div className="player-info">
               {gameState.players.map((player, index) => (

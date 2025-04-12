@@ -2,10 +2,62 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+
+  /* Light Mode (default) */
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --border-color: #333333;
+  --button-bg: #4CAF50;
+  --button-text: #ffffff;
+  --button-hover: #45a049;
+  --cell-bg: #ffffff;
+  --cell-hover: #f0f0f0;
+  --cell-disabled: #f0f0f0;
+  --info-bg: #f5f5f5;
+  --info-text-bg: #e8f4f8;
+  --info-border: #4CAF50;
+  --error-bg: #ffebee;
+  --error-text: #f44336;
+  --popup-overlay: rgba(0, 0, 0, 0.5);
+  --popup-bg: #ffffff;
+  --popup-header: #f5f5f5;
+  --popup-border: #dddddd;
+  --waiting-text: #ff9800;
+  --winner-text: #4CAF50;
+  --not-your-turn: #f44336;
+  --current-player: #4CAF50;
+}
+
+[data-theme="dark"] {
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --border-color: #555555;
+  --button-bg: #388E3C;
+  --button-text: #ffffff;
+  --button-hover: #2E7D32;
+  --cell-bg: #1e1e1e;
+  --cell-hover: #2c2c2c;
+  --cell-disabled: #2c2c2c;
+  --info-bg: #1e1e1e;
+  --info-text-bg: #263238;
+  --info-border: #388E3C;
+  --error-bg: #311b1b;
+  --error-text: #e57373;
+  --popup-overlay: rgba(0, 0, 0, 0.7);
+  --popup-bg: #1e1e1e;
+  --popup-header: #2c2c2c;
+  --popup-border: #555555;
+  --waiting-text: #FFB74D;
+  --winner-text: #81C784;
+  --not-your-turn: #e57373;
+  --current-player: #81C784;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-} 
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

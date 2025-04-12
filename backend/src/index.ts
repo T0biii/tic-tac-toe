@@ -51,7 +51,8 @@ io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
   socket.on('createGame', ({ playerName }) => {
-    const gameId = uuidv4();
+    // Generiere eine kürzere Game-ID mit 5 Zeichen
+    const gameId = Math.random().toString(36).substring(2, 7).toUpperCase();
     const game: Game = {
       id: gameId,
       board: Array(9).fill(''),
