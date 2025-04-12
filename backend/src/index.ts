@@ -51,7 +51,6 @@ io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
   socket.on('createGame', ({ playerName }) => {
-    console.log('Player created game:', socket.id, playerName);
     // Generiere eine kürzere Game-ID mit 5 Zeichen
     const gameId = Math.random().toString(36).substring(2, 7).toUpperCase();
     const game: Game = {
@@ -70,10 +69,12 @@ io.on('connection', (socket) => {
     socket.emit('gameId', gameId);
     socket.emit('playerId', socket.id);
     socket.emit('gameState', game);
+    console.log('Player created game:', socket.id, playerName, gameId);
+
   });
   
   socket.on('voteRestart', ({ gameId, playerId }) => {
-    console.log('Player voted for restart:', playerId);
+    console.log('Player voted for restart:', playerId, gameId);
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', 'Game not found');
@@ -115,7 +116,7 @@ io.on('connection', (socket) => {
   
   // Behalte die alte restartGame-Funktion für Kompatibilität
   socket.on('restartGame', ({ gameId }) => {
-    console.log('Player requested restart:', socket.id);
+    console.log('Player requested restart:', socket.id, gameId);
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', 'Game not found');
@@ -159,7 +160,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('makeMove', ({ gameId, playerId, position }: { gameId: string; playerId: string; position: number }) => {
-    console.log('Player made move:', playerId, position);
+    console.log('Player made move:', playerId, position, gameId);
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', 'Game not found');
