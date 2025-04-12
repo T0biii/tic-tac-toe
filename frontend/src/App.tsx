@@ -15,6 +15,7 @@ interface GameState {
   winner: string | null;
   gameOver: boolean;
   players: { id: string; symbol: string; name: string }[];
+  restartVotes?: { [playerId: string]: boolean };
 }
 
 function App() {
