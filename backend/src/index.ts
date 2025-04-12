@@ -2,7 +2,6 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import { v4 as uuidv4 } from 'uuid';
 
 const app = express();
 const httpServer = createServer(app);
@@ -52,6 +51,7 @@ io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
   socket.on('createGame', ({ playerName }) => {
+    console.log('Player created game:', socket.id, playerName);
     // Generiere eine kürzere Game-ID mit 5 Zeichen
     const gameId = Math.random().toString(36).substring(2, 7).toUpperCase();
     const game: Game = {
@@ -73,6 +73,7 @@ io.on('connection', (socket) => {
   });
   
   socket.on('voteRestart', ({ gameId, playerId }) => {
+    console.log('Player voted for restart:', playerId);
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', 'Game not found');
@@ -114,6 +115,7 @@ io.on('connection', (socket) => {
   
   // Behalte die alte restartGame-Funktion für Kompatibilität
   socket.on('restartGame', ({ gameId }) => {
+    console.log('Player requested restart:', socket.id);
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', 'Game not found');
@@ -133,6 +135,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('joinGame', ({ gameId, playerName }) => {
+    console.log('Player joined game:', socket.id, playerName, gameId);
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', 'Game not found');
@@ -156,6 +159,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('makeMove', ({ gameId, playerId, position }: { gameId: string; playerId: string; position: number }) => {
+    console.log('Player made move:', playerId, position);
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', 'Game not found');
