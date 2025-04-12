@@ -24,6 +24,7 @@
     "winner": "Winner",
     "draw": "It's a draw!",
     "startNewGame": "Start New Game",
+    "waitingForPlayers": "Waiting for all players to agree",
     "playerLeft": "The other player has left the game.",
     "startNewGameQuestion": "Would you like to start a new game?"
   },

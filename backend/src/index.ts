@@ -22,6 +22,7 @@ interface Game {
   players: { id: string; symbol: string; name: string }[];
   winner: string | null;
   gameOver: boolean;
+  restartVotes?: { [playerId: string]: boolean };
 }
 
 const games: Map<string, Game> = new Map();
@@ -71,6 +72,47 @@ io.on('connection', (socket) => {
     socket.emit('gameState', game);
   });
   
+  socket.on('voteRestart', ({ gameId, playerId }) => {
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', 'Game not found');
+      return;
+    }
+    
+    if (!game.gameOver) {
+      socket.emit('error', 'Game is not over yet');
+      return;
+    }
+    
+    // Initialisiere restartVotes, falls es noch nicht existiert
+    if (!game.restartVotes) {
+      game.restartVotes = {};
+    }
+    
+    // Spieler stimmt für Neustart
+    game.restartVotes[playerId] = true;
+    
+    // Prüfe, ob alle Spieler für Neustart gestimmt haben
+    const totalVotes = Object.keys(game.restartVotes).length;
+    const totalPlayers = game.players.length;
+    
+    if (totalVotes === totalPlayers) {
+      // Alle Spieler haben zugestimmt, Spiel zurücksetzen
+      game.board = Array(9).fill('');
+      game.currentPlayer = 'X';
+      game.winner = null;
+      game.gameOver = false;
+      game.restartVotes = {}; // Zurücksetzen der Stimmen
+    }
+    
+    // Aktualisiere das Spiel in der Map
+    games.set(gameId, game);
+    
+    // Sende den aktualisierten Spielstatus an alle Spieler
+    io.to(gameId).emit('gameState', game);
+  });
+  
+  // Behalte die alte restartGame-Funktion für Kompatibilität
   socket.on('restartGame', ({ gameId }) => {
     const game = games.get(gameId);
     if (!game) {
@@ -78,17 +120,13 @@ io.on('connection', (socket) => {
       return;
     }
     
-    // Behalte die Spieler bei, setze aber das Spielfeld zurück
-    const players = game.players;
+    // Initialisiere restartVotes, falls es noch nicht existiert
+    if (!game.restartVotes) {
+      game.restartVotes = {};
+    }
     
-    // Spiel zurücksetzen
-    game.board = Array(9).fill('');
-    game.currentPlayer = 'X';
-    game.winner = null;
-    game.gameOver = false;
-    
-    // Aktualisiere das Spiel in der Map
-    games.set(gameId, game);
+    // Spieler stimmt für Neustart
+    game.restartVotes[socket.id] = true;
     
     // Sende den aktualisierten Spielstatus an alle Spieler
     io.to(gameId).emit('gameState', game);
@@ -164,10 +202,11 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
-    // Clean up games where this player was participating
+    // Markiere den Spieler als getrennt, aber behalte das Spiel
     for (const [gameId, game] of games.entries()) {
-      if (game.players.some(p => p.id === socket.id)) {
-        games.delete(gameId);
+      const playerIndex = game.players.findIndex(p => p.id === socket.id);
+      if (playerIndex !== -1) {
+        // Informiere andere Spieler, dass ein Spieler getrennt wurde
         io.to(gameId).emit('error', 'Other player disconnected');
       }
     }

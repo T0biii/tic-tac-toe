@@ -63,6 +63,14 @@ npm run dev
 4. Klicken Sie auf "Join Game"
 5. Spielen Sie abwechselnd, bis ein Gewinner feststeht oder das Spiel unentschieden ist
 
+## Screenshots
+
+![Screenshot 1](screenshots/image1.png)
+![Screenshot 2](screenshots/image2.png)
+![Screenshot 3](screenshots/image3.png)
+![Screenshot 4](screenshots/image4.png)
+![Screenshot 5](screenshots/image5.png)
+
 ## Technologien
 
 - Frontend:

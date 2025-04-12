@@ -5,6 +5,7 @@ import './App.css';
 import './i18n/i18n';
 import Popup from './components/Popup';
 import LanguageSelector from './components/LanguageSelector';
+import confetti from 'canvas-confetti';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
@@ -117,6 +118,22 @@ function App() {
     });
 
     newSocket.on('gameState', (state: GameState) => {
+      // Prüfe, ob ein Gewinner feststeht und das Spiel gerade beendet wurde
+      if (state.winner && state.gameOver && !gameState.gameOver) {
+        // Zeige Konfetti nur an, wenn es kein Unentschieden ist
+        if (state.winner !== 'draw') {
+          // Prüfe, ob der aktuelle Spieler der Gewinner ist
+          const currentPlayerSymbol = gameState.players.find(p => p.id === playerId)?.symbol;
+          if (currentPlayerSymbol === state.winner) {
+            // Konfetti für den Gewinner anzeigen
+            confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 }
+            });
+          }
+        }
+      }
       setGameState(state);
     });
 
@@ -314,7 +331,14 @@ function App() {
           </div>
           
           {gameState.gameOver && (
-            <button onClick={createNewGame}>{t('game.startNewGame')}</button>
+            <button onClick={createNewGame} className="restart-button">
+              {t('game.startNewGame')}
+              {gameState.restartVotes && (
+                <span className="restart-votes">
+                  ({Object.keys(gameState.restartVotes).length}/{gameState.players.length})
+                </span>
+              )}
+            </button>
           )}
         </div>
       )}

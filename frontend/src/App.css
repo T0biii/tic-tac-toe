@@ -168,6 +168,19 @@
   margin-top: 10px;
 }
 
+.restart-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 15px auto;
+}
+
+.restart-votes {
+  font-size: 0.8em;
+  opacity: 0.8;
+}
+
 .error {
   color: var(--error-text);
   margin: 10px 0;

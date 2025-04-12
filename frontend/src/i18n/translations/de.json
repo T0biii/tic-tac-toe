@@ -24,6 +24,7 @@
     "winner": "Gewinner",
     "draw": "Unentschieden!",
     "startNewGame": "Neues Spiel starten",
+    "waitingForPlayers": "Warte auf Zustimmung aller Spieler",
     "playerLeft": "Der andere Spieler hat das Spiel verlassen.",
     "startNewGameQuestion": "Möchtest du ein neues Spiel starten?"
   },
